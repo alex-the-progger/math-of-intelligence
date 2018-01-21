@@ -1,17 +1,11 @@
+import k_means_base
 from matplotlib import pyplot as plt
 import numpy as np
-import pandas as pd
 
 
-class KMeansClassifier:
+class KMeansClassifier(k_means_base.BaseKMeansClassifier):
     def __init__(self, input_file_name, clusters_count, available_colors=None, save_history=False):
-        self.INPUT_FILE_NAME = input_file_name
-        self.CLUSTERS_COUNT = clusters_count
-        self.AVAILABLE_COLORS = ["b", "g", "r", "c", "m", "y", "k", "w"] if available_colors is None else available_colors
-
-        # read the data set
-        df = pd.read_csv(self.INPUT_FILE_NAME)
-        self.points = df.as_matrix()
+        super(KMeansClassifier, self).__init__(input_file_name, clusters_count, available_colors, save_history)
 
         # randomly choose centroids
         self.centroids = self.points[np.random.choice(self.points.shape[0], self.CLUSTERS_COUNT, replace=False)]
@@ -33,17 +27,6 @@ class KMeansClassifier:
 
         return closest_indices
 
-    def plot_points(self):
-        closest_centroid_indices = KMeansClassifier.get_closest_centroid_indices(self.points, self.centroids)
-        for i, index in enumerate(closest_centroid_indices):
-            point = self.points[i]
-            color = self.AVAILABLE_COLORS[index]
-            plt.scatter(point[0], point[1], c=color, marker="o", s=2)
-
-    def plot_centroids(self):
-        for i, centroid in enumerate(self.centroids):
-            plt.scatter(centroid[0], centroid[1], c=self.AVAILABLE_COLORS[i], marker="^")
-
     def plot_history_centroids(self):
         if self.save_history:
             for i in range(1, len(self.history_centroids)):
@@ -61,14 +44,6 @@ class KMeansClassifier:
                 for i, centroid in enumerate(iteration):
                     plt.scatter(centroid[0], centroid[1], c=self.AVAILABLE_COLORS[i], marker="^")
 
-    def plot(self):
-        self.plot_points()
-        self.plot_centroids()
-
-    def show_plot(self):
-        self.plot()
-        plt.show()
-
     def reinitialize_centroids(self):
         closest_centroid_indices = self.predict(self.points)
         new_centroids = np.zeros(self.centroids.shape)
@@ -84,10 +59,9 @@ class KMeansClassifier:
 
         return continue_learning
 
-    def calculate_best_centroids(self, after_step_func=None):
+    def calculate_best_centroids(self):
         while self.reinitialize_centroids():
-            if after_step_func is not None:
-                after_step_func()
+            pass
 
     def predict(self, points):
         return KMeansClassifier.get_closest_centroid_indices(points, self.centroids)
