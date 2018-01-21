@@ -70,7 +70,7 @@ class KMeansClassifier:
         plt.show()
 
     def reinitialize_centroids(self):
-        closest_centroid_indices = KMeansClassifier.get_closest_centroid_indices(self.points, self.centroids)
+        closest_centroid_indices = self.predict(self.points)
         new_centroids = np.zeros(self.centroids.shape)
         for i in range(self.centroids.shape[0]):
             closest_points = np.array([p for j, p in enumerate(self.points) if closest_centroid_indices[j] == i])
@@ -88,6 +88,9 @@ class KMeansClassifier:
         while self.reinitialize_centroids():
             if after_step_func is not None:
                 after_step_func()
+
+    def predict(self, points):
+        return KMeansClassifier.get_closest_centroid_indices(points, self.centroids)
 
 
 def main():
